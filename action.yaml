@@ -1,0 +1,80 @@
+name: Build and publish NuGet package
+description: Builds and publishes a NuGet package to the package registry.
+
+inputs:
+  nugetAuthToken:
+    description: The NuGet authentication token to use when pushing the package.
+    required: true
+  projectFile:
+    description: The project file to package such as MyProject.csproj. Do not include the path here, use projectDirectory instead if necessary.
+    required: true
+  version:
+    description: The semantic version to apply such as 1.0.0 or 1.0.0-alpha2+a12b345.
+    required: true
+  registryUsername:
+    description: The username to use to authenticate with the container registry for pulling devcontainers. If not provided, no login will be performed.
+    required: false
+    default: ''
+  registryPassword:
+    description: The token to use to authenticate with the container registry for pulling devcontainers. If not provided, no login will be performed.
+    required: false
+    default: ''
+  registryHost:
+    description: The host of the container registry to pull devcontainers from. If not provided, no login will be performed.
+    required: false
+    default: ''
+  packageRepository:
+    description: The URL of the NuGet package repository to push to.
+    required: false
+    default: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+  projectDirectory:
+    description: The directory containing the project to be packaged. Defaults to ./
+    required: false
+    default: ./
+  workingDirectory:
+    description: The directory to run commands in. Defaults to ./
+    required: false
+    default: ./
+
+runs:
+  using: composite
+  steps:
+    - name: Login to GitHub Container Registry
+      if: inputs.registryHost != '' && inputs.registryUsername != '' && inputs.registryPassword != ''
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ inputs.registryHost }}
+        username: ${{ inputs.registryUsername }}
+        password: ${{ inputs.registryPassword }}
+
+    - name: Create .env for build
+      shell: bash
+      working-directory: ${{ inputs.workingDirectory }}
+      run: |
+        cat > ./.devcontainer/.env <<EOF
+        EOF
+
+    - name: dotnet pack Release
+      if: github.ref_type == 'branch'
+      uses: devcontainers/ci@v0.3
+      with:
+        subFolder: ${{ inputs.workingDirectory }}
+        runCmd: |
+          pushd ${{ inputs.projectDirectory }}
+
+          # Update existing Version tag if it exists, otherwise add a new PropertyGroup and Version
+          if grep -q "<Version>" ${{ inputs.projectFile }}; then
+              sed -i "s#<Version>.*</Version>#<Version>${{ inputs.version }}</Version>#" ${{ inputs.projectFile }}
+          else
+              # Insert a PropertyGroup with Version right before the closing Project tag
+              sed -i 's#</Project>#  <PropertyGroup>\n    <Version>${{ inputs.version }}</Version>\n  </PropertyGroup>\n</Project>#' ${{ inputs.projectFile }}
+          fi
+          
+          dotnet pack
+          dotnet nuget push ./bin/Release/*.nupkg --source ${{ inputs.packageRepository }} --api-key ${{ inputs.nugetAuthToken }}
+          popd
+
+        push: never
+        env: |
+          NUGET_USER=${{ github.actor }}
+          NUGET_TOKEN=${{ inputs.nugetAuthToken }}
