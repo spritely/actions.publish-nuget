@@ -1,0 +1,10 @@
+services:
+  basic-test-dev:
+    container_name: basic-test-dev
+    build:
+      image: localhost:5000/basic-test-devcontainer:latest
+    volumes:
+      - ../:/src
+      - ../tests/basic-test/logs:/logs
+    env_file:
+      - .env

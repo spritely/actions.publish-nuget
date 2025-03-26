@@ -27,7 +27,7 @@ jobs:
           push: never
 
       - id: setup-tests
-        name: Start container registry and NuGet server
+        name: Setup test container registry and NuGet server
         run: |
           docker run -d -p 5000:5000 \
               -v ${{ github.workspace }}/tests/auth:/auth \

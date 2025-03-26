@@ -59,7 +59,7 @@ runs:
             fi
         else
             failure "Devcontainer log file not found"
-            ls -la "${{ github.workspace }}/tests/logs/"
+            ls -la "${{ github.workspace }}/tests/basic-test/logs/"
         fi
     
     - name: Assert NuGet package was published
