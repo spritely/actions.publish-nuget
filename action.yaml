@@ -43,21 +43,57 @@ runs:
         username: ${{ inputs.registryUsername }}
         password: ${{ inputs.registryPassword }}
 
-    - name: Create .env for build
+    - id: prepare
+      name: Prepare devcontainer environment
       shell: bash
       run: |
         mkdir -p ./.devcontainer
         touch ./.devcontainer/.env
+
+        # Need to copy the build script files to a path that will work inside the devcontainer
+        # Trying to use a path name that is very unlikely to create a conflict in any user repos
+        mkdir -p ./.github/actions/publish-nuget
+        cp "${{ github.action_path }}/publish-nuget.sh" "./.github/actions/publish-nuget/publish-nuget.sh"
+        chmod +x "./.github/actions/publish-nuget/publish-nuget.sh"
+
+        base_dir=".github-actions-publish-nuget"
+        temp_dir="$base_dir"
+        counter=1
+        
+        # Find a unique directory name
+        while [ -e "$temp_dir" ]; do
+          temp_dir="${base_dir}-${counter}"
+          counter=$((counter + 1))
+        done
+        
+        # Create the directory and copy the script
+        mkdir -p "$temp_dir"
+        cp "${{ github.action_path }}/publish-nuget.sh" "$temp_dir/publish-nuget.sh"
+        chmod +x "$temp_dir/publish-nuget.sh"
+        
+        echo "Using temporary directory: $temp_dir"
+        
+        # Set output variables
+        echo "publishNuGetDirectory=$temp_dir" >> $GITHUB_OUTPUT
 
     - name: Publish NuGet package
       if: github.ref_type == 'branch'
       uses: devcontainers/ci@v0.3
       with:
         runCmd: |
-          source "${{ github.action_path }}/publish-nuget.sh"
+          source "/src/${{ steps.prepare.outputs.publishNuGetDirectory }}/publish-nuget.sh"
         push: never
         env: |
           PROJECT_FILE=${{ inputs.projectFile }}
           VERSION=${{ inputs.version }}
           PACKAGE_REPOSITORY=${{ inputs.packageRepository }}
           NUGET_TOKEN=${{ inputs.nugetAuthToken }}
+
+    - name: Remove temporary files
+      if: always()
+      shell: bash
+      run: |
+        if [ -d "${{ steps.prepare.outputs.publishNuGetDirectory }}" ]; then
+          rm -rf "${{ steps.prepare.outputs.publishNuGetDirectory }}"
+          echo "Removed temporary directory: ${{ steps.prepare.outputs.publishNuGetDirectory }}"
+        fi
