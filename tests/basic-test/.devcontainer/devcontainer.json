@@ -1,0 +1,8 @@
+{
+    "name": "Test .NET 8 Container",
+    "image": "localhost:5000/basic-test-devcontainer:latest",
+    "mounts": [
+        "source=${localWorkspaceFolder}/tests/basic-test/logs,target=/logs,type=bind"
+    ],
+    "features": {}
+}
