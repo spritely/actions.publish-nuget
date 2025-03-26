@@ -40,7 +40,7 @@ runs:
         projectFile: tests/basic-test/TestProject/TestProject.csproj
         version: 1.0.0
         nugetAuthToken: fake-token
-        packageRepository: http://localhost:5001/v3/index.json
+        packageRepository: http://host.docker.internal:5001/v3/index.json
 
     - name: Assert custom devcontainer was used
       shell: bash
