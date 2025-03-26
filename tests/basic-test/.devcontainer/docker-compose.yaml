@@ -3,6 +3,7 @@ services:
     container_name: basic-test-dev
     image: localhost:5000/basic-test-devcontainer:latest
     command: /bin/sh -c "sleep infinity"
+    network_mode: "host"
     volumes:
       - ../:/src
       - ../tests/basic-test/logs:/logs
