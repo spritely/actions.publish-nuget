@@ -1,8 +1,8 @@
 services:
   basic-test-dev:
     container_name: basic-test-dev
-    build:
-      image: localhost:5000/basic-test-devcontainer:latest
+    image: localhost:5000/basic-test-devcontainer:latest
+    command: /bin/sh -c "sleep infinity"
     volumes:
       - ../:/src
       - ../tests/basic-test/logs:/logs
