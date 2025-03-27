@@ -48,20 +48,21 @@ runs:
       run: |
         source ${{ github.workspace }}/tests/test-reporter.sh
         set_test_name "Assert custom devcontainer was used"
+
+        log_file="${{ github.workspace }}/tests/workflow-test/logs/devcontainer.log"
         
-        if [ -f "${{ github.workspace }}/tests/workflow-test/logs/devcontainer.log" ]; then
-            if grep -q "CUSTOM_DEVCONTAINER: workflow-test-container" "${{ github.workspace }}/tests/logs/devcontainer.log"; then
+        if [ -f "$log_file" ]; then
+            if grep -q "CUSTOM_DEVCONTAINER: workflow-test-container" "$log_file"; then
                 success "Custom devcontainer was used"
-                cat "${{ github.workspace }}/tests/workflow-test/logs/devcontainer.log"
             else
                 failure "Custom devcontainer marker not found in logs"
-                cat "${{ github.workspace }}/tests/workflow-test/logs/devcontainer.log"
             fi
+            cat "$log_file"
         else
             failure "Devcontainer log file not found"
             ls -la "${{ github.workspace }}/tests/workflow-test/logs/"
         fi
-    
+
     - name: Assert NuGet package was published
       shell: bash
       if: always()
@@ -69,6 +70,9 @@ runs:
         source ${{ github.workspace }}/tests/test-reporter.sh
         set_test_name "Assert NuGet package was published"
         
+        # Wait for server to index packages
+        sleep 5
+
         # Query the NuGet server API to check if the package exists
         response=$(curl -s "http://localhost:5001/v3/package/TestProject/1.0.0" -o /dev/null -w "%{http_code}")
         
