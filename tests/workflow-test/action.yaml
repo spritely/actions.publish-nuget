@@ -1,5 +1,5 @@
-name: Publish NuGet publishes expected package
-description: Test to validate that publish NuGet publishes expected package
+name: Publish NuGet workflow uses devcontainer and publishes packages
+description: Test to validate that publish NuGet workflow uses devcontainer and publishes packages
 
 runs:
   using: composite
@@ -8,7 +8,7 @@ runs:
       shell: bash
       run: |
         source ${{ github.workspace }}/tests/test-reporter.sh
-        initialize_test "Publish NuGet publishes expected package" "workflow-test"
+        initialize_test "Publish NuGet workflow uses devcontainer and publishes packages" "workflow-test"
 
     - name: Prepare test environment
       shell: bash

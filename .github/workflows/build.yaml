@@ -31,27 +31,27 @@ jobs:
               -e ApiKey=fake-token \
               --name baget loicsharma/baget:0.4.0-preview2
 
-      - name: Run test - Publish NuGet workflow uses devcontainer and publishes packages
+      - name: Run test - workflow-test
         uses: ./tests/workflow-test
         if: always() && steps.setup-tests.outcome == 'success'
 
-      - name: Run tests - Publish NuGet handles versioning and publishing
+      - name: Run tests - publish-nuget
         uses: devcontainers/ci@v0.3
         if: always()
         with:
           runCmd: |
             bats --version
             bats --print-output-on-failure --report-formatter junit ./tests/
-            ls
+            tree
           push: never
 
       - name: Copy test report
         if: always()
         shell: bash
         run: |
-          tree
           mkdir -p test-reports
-          cp report.xml ./test-reports/publish-nuget.xml
+          mv report.xml ./test-reports/publish-nuget.xml
+          tree
 
       - name: Add test report title
         if: always()
