@@ -41,16 +41,8 @@ jobs:
         with:
           runCmd: |
             bats --version
-            bats --print-output-on-failure --report-formatter junit ./tests/
+            bats --print-output-on-failure --report-formatter junit --output ./test-results/ ./tests/
           push: never
-
-      - name: Copy test report
-        if: always()
-        shell: bash
-        run: |
-          mkdir -p test-results
-          mv report.xml ./test-results/publish-nuget.xml
-          tree
 
       - name: Add test report title
         if: always()
