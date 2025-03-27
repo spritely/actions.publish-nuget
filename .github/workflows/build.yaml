@@ -17,15 +17,6 @@ jobs:
           cat > ./.devcontainer/.env <<EOF
           EOF
 
-      - name: Run tests
-        uses: devcontainers/ci@v0.3
-        with:
-          runCmd: |
-            mkdir -p test-reports
-            bats --version
-            bats --print-output-on-failure --report-formatter junit --output ./test-reports/ ./tests/
-          push: never
-
       - id: setup-tests
         name: Setup test container registry and NuGet server
         run: |
@@ -40,9 +31,25 @@ jobs:
               -e ApiKey=fake-token \
               --name baget loicsharma/baget:0.4.0-preview2
 
-      - name: Run test - Publish NuGet publishes expected package
+      - name: Run test - Publish NuGet workflow uses devcontainer and publishes packages
         uses: ./tests/basic-test
         if: always() && steps.setup-tests.outcome == 'success'
+
+      - name: Run tests - Publish NuGet handles versioning and publishing
+        uses: devcontainers/ci@v0.3
+        if: always()
+        with:
+          runCmd: |
+            bats --version
+            bats --print-output-on-failure --report-formatter junit ./tests/
+          push: never
+
+      - name: Copy test report
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p test-reports
+          cp report.xml ./test-reports/publish-test.xml
 
       - name: Add test report title
         if: always()
