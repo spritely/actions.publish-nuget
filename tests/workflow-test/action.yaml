@@ -8,12 +8,12 @@ runs:
       shell: bash
       run: |
         source ${{ github.workspace }}/tests/test-reporter.sh
-        initialize_test "Publish NuGet publishes expected package" "basic-test"
+        initialize_test "Publish NuGet publishes expected package" "workflow-test"
 
     - name: Prepare test environment
       shell: bash
       run: |
-        mkdir -p "${{ github.workspace }}/tests/basic-test/logs"
+        mkdir -p "${{ github.workspace }}/tests/workflow-test/logs"
 
         # Back up existing .devcontainer
         if [ -d "${{ github.workspace }}/.devcontainer" ]; then
@@ -21,15 +21,15 @@ runs:
         fi
         
         # Copy our test .devcontainer to the root
-        cp -r "${{ github.workspace }}/tests/basic-test/.devcontainer" "${{ github.workspace }}/"
+        cp -r "${{ github.workspace }}/tests/workflow-test/.devcontainer" "${{ github.workspace }}/"
 
         # Create and push test container image
-        docker build -t localhost:5000/basic-test-devcontainer:latest \
-            -f ${{ github.workspace }}/tests/basic-test/devcontainer-to-publish/Dockerfile \
-            ${{ github.workspace }}/tests/basic-test/devcontainer-to-publish/
+        docker build -t localhost:5000/workflow-test-devcontainer:latest \
+            -f ${{ github.workspace }}/tests/workflow-test/devcontainer-to-publish/Dockerfile \
+            ${{ github.workspace }}/tests/workflow-test/devcontainer-to-publish/
 
         docker login localhost:5000 -u testuser -p testpassword
-        docker push localhost:5000/basic-test-devcontainer:latest
+        docker push localhost:5000/workflow-test-devcontainer:latest
 
     - name: Run publish-nuget action
       uses: ./
@@ -37,7 +37,7 @@ runs:
         registryHost: localhost:5000
         registryUsername: testuser
         registryPassword: testpassword
-        projectFile: tests/basic-test/TestProject/TestProject.csproj
+        projectFile: tests/workflow-test/TestProject/TestProject.csproj
         version: 1.0.0
         nugetAuthToken: fake-token
         packageRepository: http://localhost:5001/v3/index.json
@@ -49,17 +49,17 @@ runs:
         source ${{ github.workspace }}/tests/test-reporter.sh
         set_test_name "Assert custom devcontainer was used"
         
-        if [ -f "${{ github.workspace }}/tests/basic-test/logs/devcontainer.log" ]; then
-            if grep -q "CUSTOM_DEVCONTAINER: basic-test-container" "${{ github.workspace }}/tests/logs/devcontainer.log"; then
+        if [ -f "${{ github.workspace }}/tests/workflow-test/logs/devcontainer.log" ]; then
+            if grep -q "CUSTOM_DEVCONTAINER: workflow-test-container" "${{ github.workspace }}/tests/logs/devcontainer.log"; then
                 success "Custom devcontainer was used"
-                cat "${{ github.workspace }}/tests/basic-test/logs/devcontainer.log"
+                cat "${{ github.workspace }}/tests/workflow-test/logs/devcontainer.log"
             else
                 failure "Custom devcontainer marker not found in logs"
-                cat "${{ github.workspace }}/tests/basic-test/logs/devcontainer.log"
+                cat "${{ github.workspace }}/tests/workflow-test/logs/devcontainer.log"
             fi
         else
             failure "Devcontainer log file not found"
-            ls -la "${{ github.workspace }}/tests/basic-test/logs/"
+            ls -la "${{ github.workspace }}/tests/workflow-test/logs/"
         fi
     
     - name: Assert NuGet package was published

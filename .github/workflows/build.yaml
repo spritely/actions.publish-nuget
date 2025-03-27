@@ -32,7 +32,7 @@ jobs:
               --name baget loicsharma/baget:0.4.0-preview2
 
       - name: Run test - Publish NuGet workflow uses devcontainer and publishes packages
-        uses: ./tests/basic-test
+        uses: ./tests/workflow-test
         if: always() && steps.setup-tests.outcome == 'success'
 
       - name: Run tests - Publish NuGet handles versioning and publishing
@@ -42,14 +42,16 @@ jobs:
           runCmd: |
             bats --version
             bats --print-output-on-failure --report-formatter junit ./tests/
+            ls
           push: never
 
       - name: Copy test report
         if: always()
         shell: bash
         run: |
+          tree
           mkdir -p test-reports
-          cp report.xml ./test-reports/publish-test.xml
+          cp report.xml ./test-reports/publish-nuget.xml
 
       - name: Add test report title
         if: always()
