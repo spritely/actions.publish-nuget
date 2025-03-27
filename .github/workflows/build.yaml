@@ -42,15 +42,14 @@ jobs:
           runCmd: |
             bats --version
             bats --print-output-on-failure --report-formatter junit ./tests/
-            tree
           push: never
 
       - name: Copy test report
         if: always()
         shell: bash
         run: |
-          mkdir -p test-reports
-          mv report.xml ./test-reports/publish-nuget.xml
+          mkdir -p test-results
+          mv report.xml ./test-results/publish-nuget.xml
           tree
 
       - name: Add test report title
