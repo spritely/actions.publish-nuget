@@ -15,10 +15,6 @@ inputs:
     description: The URL of the NuGet package repository to push to.
     required: false
     default: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-  projectDirectory:
-    description: The directory containing the project to be packaged relative to repository root. Defaults to ./
-    required: false
-    default: ./
   registryHost:
     description: The host of the container registry to pull devcontainers from. If not provided, no login will be performed.
     required: false
