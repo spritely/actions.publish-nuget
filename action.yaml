@@ -1,0 +1,95 @@
+name: Build and publish NuGet package through the repos devcontainer
+description: Builds and publishes a NuGet package to the package registry.
+
+inputs:
+  nugetAuthToken:
+    description: The NuGet authentication token to use when pushing the package.
+    required: true
+  projectFile:
+    description: The project file to package such as MyProject/MyProject.csproj. Include the relative path from the root of the repository if necessary.
+    required: true
+  version:
+    description: The semantic version to apply such as 1.0.0 or 1.0.0-alpha2+a12b345.
+    required: true
+  packageRepository:
+    description: The URL of the NuGet package repository to push to.
+    required: false
+    default: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+  registryHost:
+    description: The host of the container registry to pull devcontainers from. If not provided, no login will be performed.
+    required: false
+    default: ''
+  registryUsername:
+    description: The username to use to authenticate with the container registry for pulling devcontainers. If not provided, no login will be performed.
+    required: false
+    default: ''
+  registryPassword:
+    description: The token to use to authenticate with the container registry for pulling devcontainers. If not provided, no login will be performed.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Login to GitHub container registry
+      if: inputs.registryHost != '' && inputs.registryUsername != '' && inputs.registryPassword != ''
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ inputs.registryHost }}
+        username: ${{ inputs.registryUsername }}
+        password: ${{ inputs.registryPassword }}
+
+    - id: prepare
+      name: Prepare devcontainer environment
+      shell: bash
+      run: |
+        mkdir -p ./.devcontainer
+        touch ./.devcontainer/.env
+
+        # Need to copy the build script files to a path that will work inside the devcontainer
+        # Trying to use a path name that is very unlikely to create a conflict in any user repos
+        mkdir -p ./.github/actions/publish-nuget
+        cp "${{ github.action_path }}/publish-nuget.sh" "./.github/actions/publish-nuget/publish-nuget.sh"
+        chmod +x "./.github/actions/publish-nuget/publish-nuget.sh"
+
+        base_dir=".github-actions-publish-nuget"
+        temp_dir="$base_dir"
+        counter=1
+        
+        # Find a unique directory name
+        while [ -e "$temp_dir" ]; do
+          temp_dir="${base_dir}-${counter}"
+          counter=$((counter + 1))
+        done
+        
+        # Create the directory and copy the script
+        mkdir -p "$temp_dir"
+        cp "${{ github.action_path }}/publish-nuget.sh" "$temp_dir/publish-nuget.sh"
+        chmod +x "$temp_dir/publish-nuget.sh"
+        
+        echo "Using temporary directory: $temp_dir"
+        
+        # Set output variables
+        echo "publishNuGetDirectory=$temp_dir" >> $GITHUB_OUTPUT
+
+    - name: Publish NuGet package
+      if: github.ref_type == 'branch'
+      uses: devcontainers/ci@v0.3
+      with:
+        runCmd: |
+          source "/src/${{ steps.prepare.outputs.publishNuGetDirectory }}/publish-nuget.sh"
+        push: never
+        env: |
+          PROJECT_FILE=${{ inputs.projectFile }}
+          VERSION=${{ inputs.version }}
+          PACKAGE_REPOSITORY=${{ inputs.packageRepository }}
+          NUGET_TOKEN=${{ inputs.nugetAuthToken }}
+
+    - name: Remove temporary files
+      if: always()
+      shell: bash
+      run: |
+        if [ -d "${{ steps.prepare.outputs.publishNuGetDirectory }}" ]; then
+          rm -rf "${{ steps.prepare.outputs.publishNuGetDirectory }}"
+          echo "Removed temporary directory: ${{ steps.prepare.outputs.publishNuGetDirectory }}"
+        fi
