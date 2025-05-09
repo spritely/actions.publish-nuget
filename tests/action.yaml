@@ -8,6 +8,8 @@ runs:
       name: Setup test container registry and NuGet server
       shell: bash
       run: |
+        mkdir -p /tmp/test-results
+
         docker run -d -p 5000:5000 \
             -v ${{ github.workspace }}/tests/container-registry:/auth \
             -e REGISTRY_AUTH=htpasswd \
