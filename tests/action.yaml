@@ -28,6 +28,7 @@ runs:
       if: always()
       with:
         runCmd: |
+          mkdir -p test-results
           bats --version
           bats --print-output-on-failure --report-formatter junit --output ./test-results/ ./tests/
         push: never
