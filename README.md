@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: spritely/actions.publish-nuget@v0.1.0
+      - uses: spritely/actions.publish-nuget@v0.1.1
         with:
           nugetAuthToken: ${{ github.token }}
           projectFile: MyProject/MyProject.csproj
@@ -49,7 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: spritely/actions.publish-nuget@v1
+      - uses: spritely/actions.publish-nuget@v0.1.1
         with:
           nugetAuthToken: ${{ github.token }}
           projectFile: MyPackage/MyPackage.csproj
