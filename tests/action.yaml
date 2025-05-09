@@ -6,6 +6,7 @@ runs:
   steps:
     - id: setup-tests
       name: Setup test container registry and NuGet server
+      shell: bash
       run: |
         docker run -d -p 5000:5000 \
             -v ${{ github.workspace }}/tests/container-registry:/auth \
@@ -33,6 +34,7 @@ runs:
 
     - name: Add test report title
       if: always()
+      shell: bash
       run: |
         echo "# Test Results" >> $GITHUB_STEP_SUMMARY
 
