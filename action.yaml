@@ -47,28 +47,24 @@ runs:
         touch ./.devcontainer/.env
 
         # Need to copy the build script files to a path that will work inside the devcontainer
-        # Trying to use a path name that is very unlikely to create a conflict in any user repos
-        mkdir -p ./.github/actions/publish-nuget
-        cp "${{ github.action_path }}/publish-nuget.sh" "./.github/actions/publish-nuget/publish-nuget.sh"
-        chmod +x "./.github/actions/publish-nuget/publish-nuget.sh"
-
+        # Find a path that will not conflict with user files
         base_dir=".github-actions-publish-nuget"
         temp_dir="$base_dir"
         counter=1
-        
+
         # Find a unique directory name
         while [ -e "$temp_dir" ]; do
           temp_dir="${base_dir}-${counter}"
           counter=$((counter + 1))
         done
-        
+
         # Create the directory and copy the script
         mkdir -p "$temp_dir"
         cp "${{ github.action_path }}/publish-nuget.sh" "$temp_dir/publish-nuget.sh"
         chmod +x "$temp_dir/publish-nuget.sh"
-        
+
         echo "Using temporary directory: $temp_dir"
-        
+
         # Set output variables
         echo "publishNuGetDirectory=$temp_dir" >> $GITHUB_OUTPUT
 
