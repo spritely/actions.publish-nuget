@@ -12,11 +12,13 @@ updates:
       all-actions:
         patterns:
           - "*"
-  - package-ecosystem: "docker-compose"
+  - package-ecosystem: docker-compose
     directories:
       - "**/*"
     schedule:
-      interval: "daily"
+      interval: daily
+    ignore:
+      - dependency-name: localhost
     groups:
       all-actions:
         patterns:
