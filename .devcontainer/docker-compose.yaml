@@ -1,7 +1,7 @@
 services:
   actions-publish-nuget-dev:
     container_name: actions-publish-nuget-dev
-    image: docker.io/spritelydev/dotnet8-devcontainer:0.2.7
+    image: docker.io/spritelydev/dotnet8-devcontainer:0.2.8
     command: /bin/sh -c "sleep infinity"
     volumes:
       - ../:/src
