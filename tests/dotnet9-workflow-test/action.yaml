@@ -27,7 +27,7 @@ runs:
         cp -r "${{ github.workspace }}/tests/dotnet9-workflow-test/.devcontainer" "${{ github.workspace }}/"
 
         # Copy test NuGet.Config to workspace root to allow insecure HTTP for testing
-        cp "${{ github.workspace }}/tests/dotnet9-workflow-test/TestProject/NuGet.Config" "${{ github.workspace }}/NuGet.Config"
+        cp "${{ github.workspace }}/tests/dotnet9-workflow-test/TestDotnet9/NuGet.Config" "${{ github.workspace }}/NuGet.Config"
 
         # Create and push test container image
         docker build -t localhost:5000/dotnet9-workflow-test-devcontainer:latest \
@@ -43,7 +43,7 @@ runs:
         registryHost: localhost:5000
         registryUsername: testuser
         registryPassword: testpassword
-        projectFile: tests/dotnet9-workflow-test/TestProject/TestProject.csproj
+        projectFile: tests/dotnet9-workflow-test/TestDotnet9/TestDotnet9.csproj
         version: 1.0.0
         nugetAuthToken: fake-token
         packageRepository: http://localhost:5001/v3/index.json
@@ -77,16 +77,16 @@ runs:
         set_test_name "Assert NuGet package was published"
 
         # Query the NuGet server API to check if the package exists
-        response=$(curl -s "http://localhost:5001/v3/registration/testproject/1.0.0.json" -o /dev/null -w "%{http_code}")
+        response=$(curl -s "http://localhost:5001/v3/registration/testdotnet9/1.0.0.json" -o /dev/null -w "%{http_code}")
 
         if [ "$response" -eq 200 ]; then
             success "NuGet package was published successfully"
         else
             failure "NuGet package was not found on the server (HTTP $response)"
-            
+
             # Try to get package list for debugging
-            echo "Search results for 'TestProject':"
-            curl -s "http://localhost:5001/v3/search?q=TestProject"
+            echo "Search results for 'TestDotnet9':"
+            curl -s "http://localhost:5001/v3/search?q=TestDotnet9"
         fi
 
     - name: Clean up test environment
