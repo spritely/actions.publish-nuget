@@ -1,0 +1,52 @@
+name: Publish NuGet workflow uses devcontainer and publishes packages (.NET 9)
+description: Test to validate that publish NuGet workflow uses devcontainer and publishes packages with .NET 9
+
+runs:
+  using: composite
+  steps:
+    - name: Initialize test
+      shell: bash
+      run: |
+        source ${{ github.workspace }}/tests/test-reporter.sh
+        initialize_test "Publish NuGet workflow uses devcontainer and publishes packages (.NET 9)" "dotnet9-workflow-test"
+
+    - name: Prepare test environment
+      shell: bash
+      run: |
+        ${{ github.workspace }}/tests/scripts/prepare-test-environment.sh dotnet9-workflow-test TestDotnet9
+
+    - name: Run publish-nuget action
+      uses: ./
+      with:
+        registryHost: localhost:5000
+        registryUsername: testuser
+        registryPassword: testpassword
+        projectFile: tests/dotnet9-workflow-test/TestDotnet9/TestDotnet9.csproj
+        version: 1.0.0
+        nugetAuthToken: fake-token
+        packageRepository: http://localhost:5001/v3/index.json
+
+    - name: Assert custom devcontainer was used
+      shell: bash
+      if: always()
+      run: |
+        ${{ github.workspace }}/tests/scripts/assert-devcontainer-used.sh dotnet9-workflow-test
+
+    - name: Assert NuGet package was published
+      shell: bash
+      if: always()
+      run: |
+        ${{ github.workspace }}/tests/scripts/assert-nuget-published.sh testdotnet9
+
+    - name: Clean up test environment
+      shell: bash
+      if: always()
+      run: |
+        ${{ github.workspace }}/tests/scripts/cleanup-test-environment.sh
+
+    - name: Finalize test
+      shell: bash
+      if: always()
+      run: |
+        source ${{ github.workspace }}/tests/test-reporter.sh
+        finalize_test

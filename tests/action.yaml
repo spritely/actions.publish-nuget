@@ -19,8 +19,16 @@ runs:
             -e ApiKey=fake-token \
             --name baget loicsharma/baget:0.4.0-preview2
 
-    - name: Run test - workflow-test
-      uses: ./tests/workflow-test
+    - name: Run test - dotnet8-workflow-test
+      uses: ./tests/dotnet8-workflow-test
+      if: always() && steps.setup-tests.outcome == 'success'
+
+    - name: Run test - dotnet9-workflow-test
+      uses: ./tests/dotnet9-workflow-test
+      if: always() && steps.setup-tests.outcome == 'success'
+
+    - name: Run test - dotnet10-workflow-test
+      uses: ./tests/dotnet10-workflow-test
       if: always() && steps.setup-tests.outcome == 'success'
 
     - name: Run tests - publish-nuget

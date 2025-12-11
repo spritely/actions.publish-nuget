@@ -1,12 +1,12 @@
 services:
-  actions-publish-nuget-dev:
-    container_name: actions-publish-nuget-dev
-    image: docker.io/spritelydev/dotnet10-devcontainer:0.1.1
-    privileged: true
+  dotnet9-workflow-test-dev:
+    container_name: dotnet9-workflow-test-dev
+    image: localhost:5000/dotnet9-workflow-test-devcontainer:latest
     command: /bin/sh -c "sleep infinity"
+    network_mode: "host"
     volumes:
       - ../:/src
-      - ${HOME:-$USERPROFILE}/.ssh:/root/.ssh:ro
+      - ../tests/dotnet9-workflow-test/logs:/logs
     env_file:
       - .env
     # Environment variables have higher precedence than the .env file

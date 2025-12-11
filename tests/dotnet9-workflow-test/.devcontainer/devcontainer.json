@@ -1,0 +1,7 @@
+{
+    "name": "Test .NET 9 Container",
+    "dockerComposeFile": "docker-compose.yaml",
+    "service": "dotnet9-workflow-test-dev",
+    "workspaceFolder": "/src",
+    "features": {}
+}
