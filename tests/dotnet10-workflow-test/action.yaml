@@ -1,5 +1,5 @@
-name: Publish NuGet workflow uses devcontainer and publishes packages
-description: Test to validate that publish NuGet workflow uses devcontainer and publishes packages
+name: Publish NuGet workflow uses devcontainer and publishes packages (.NET 10)
+description: Test to validate that publish NuGet workflow uses devcontainer and publishes packages with .NET 10
 
 runs:
   using: composite
@@ -8,28 +8,28 @@ runs:
       shell: bash
       run: |
         source ${{ github.workspace }}/tests/test-reporter.sh
-        initialize_test "Publish NuGet workflow uses devcontainer and publishes packages" "workflow-test"
+        initialize_test "Publish NuGet workflow uses devcontainer and publishes packages (.NET 10)" "dotnet10-workflow-test"
 
     - name: Prepare test environment
       shell: bash
       run: |
-        mkdir -p "${{ github.workspace }}/tests/workflow-test/logs"
+        mkdir -p "${{ github.workspace }}/tests/dotnet10-workflow-test/logs"
 
         # Back up existing .devcontainer
         if [ -d "${{ github.workspace }}/.devcontainer" ]; then
           mv "${{ github.workspace }}/.devcontainer" "${{ github.workspace }}/.devcontainer.bak"
         fi
-        
+
         # Copy our test .devcontainer to the root
-        cp -r "${{ github.workspace }}/tests/workflow-test/.devcontainer" "${{ github.workspace }}/"
+        cp -r "${{ github.workspace }}/tests/dotnet10-workflow-test/.devcontainer" "${{ github.workspace }}/"
 
         # Create and push test container image
-        docker build -t localhost:5000/workflow-test-devcontainer:latest \
-            -f ${{ github.workspace }}/tests/workflow-test/devcontainer-to-publish/Dockerfile \
-            ${{ github.workspace }}/tests/workflow-test/devcontainer-to-publish/
+        docker build -t localhost:5000/dotnet10-workflow-test-devcontainer:latest \
+            -f ${{ github.workspace }}/tests/dotnet10-workflow-test/devcontainer-to-publish/Dockerfile \
+            ${{ github.workspace }}/tests/dotnet10-workflow-test/devcontainer-to-publish/
 
         docker login localhost:5000 -u testuser -p testpassword
-        docker push localhost:5000/workflow-test-devcontainer:latest
+        docker push localhost:5000/dotnet10-workflow-test-devcontainer:latest
 
     - name: Run publish-nuget action
       uses: ./
@@ -37,7 +37,7 @@ runs:
         registryHost: localhost:5000
         registryUsername: testuser
         registryPassword: testpassword
-        projectFile: tests/workflow-test/TestProject/TestProject.csproj
+        projectFile: tests/dotnet10-workflow-test/TestProject/TestProject.csproj
         version: 1.0.0
         nugetAuthToken: fake-token
         packageRepository: http://localhost:5001/v3/index.json
@@ -49,10 +49,10 @@ runs:
         source ${{ github.workspace }}/tests/test-reporter.sh
         set_test_name "Assert custom devcontainer was used"
 
-        log_file="${{ github.workspace }}/tests/workflow-test/logs/devcontainer.log"
-        
+        log_file="${{ github.workspace }}/tests/dotnet10-workflow-test/logs/devcontainer.log"
+
         if [ -f "$log_file" ]; then
-            if grep -q "CUSTOM_DEVCONTAINER: workflow-test-container" "$log_file"; then
+            if grep -q "CUSTOM_DEVCONTAINER: dotnet10-workflow-test-container" "$log_file"; then
                 success "Custom devcontainer was used"
             else
                 failure "Custom devcontainer marker not found in logs"
@@ -60,7 +60,7 @@ runs:
             cat "$log_file"
         else
             failure "Devcontainer log file not found"
-            ls -la "${{ github.workspace }}/tests/workflow-test/logs/"
+            ls -la "${{ github.workspace }}/tests/dotnet10-workflow-test/logs/"
         fi
 
     - name: Assert NuGet package was published

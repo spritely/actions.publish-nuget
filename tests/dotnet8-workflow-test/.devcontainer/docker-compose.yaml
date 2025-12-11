@@ -1,0 +1,14 @@
+services:
+  dotnet8-workflow-test-dev:
+    container_name: dotnet8-workflow-test-dev
+    image: localhost:5000/dotnet8-workflow-test-devcontainer:latest
+    command: /bin/sh -c "sleep infinity"
+    network_mode: "host"
+    volumes:
+      - ../:/src
+      - ../tests/dotnet8-workflow-test/logs:/logs
+    env_file:
+      - .env
+    # Environment variables have higher precedence than the .env file
+    environment:
+      - NUGET_TOKEN=${NUGET_TOKEN}
