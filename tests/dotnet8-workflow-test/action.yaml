@@ -15,13 +15,19 @@ runs:
       run: |
         mkdir -p "${{ github.workspace }}/tests/dotnet8-workflow-test/logs"
 
-        # Back up existing .devcontainer
+        # Back up existing .devcontainer and NuGet.Config
         if [ -d "${{ github.workspace }}/.devcontainer" ]; then
           mv "${{ github.workspace }}/.devcontainer" "${{ github.workspace }}/.devcontainer.bak"
+        fi
+        if [ -f "${{ github.workspace }}/NuGet.Config" ]; then
+          mv "${{ github.workspace }}/NuGet.Config" "${{ github.workspace }}/NuGet.Config.bak"
         fi
 
         # Copy our test .devcontainer to the root
         cp -r "${{ github.workspace }}/tests/dotnet8-workflow-test/.devcontainer" "${{ github.workspace }}/"
+
+        # Copy test NuGet.Config to workspace root to allow insecure HTTP for testing
+        cp "${{ github.workspace }}/tests/dotnet8-workflow-test/TestProject/NuGet.Config" "${{ github.workspace }}/NuGet.Config"
 
         # Create and push test container image
         docker build -t localhost:5000/dotnet8-workflow-test-devcontainer:latest \
@@ -87,10 +93,14 @@ runs:
       shell: bash
       if: always()
       run: |
-        # Restore original .devcontainer
+        # Restore original .devcontainer and NuGet.Config
         rm -rf "${{ github.workspace }}/.devcontainer"
         if [ -d "${{ github.workspace }}/.devcontainer.bak" ]; then
           mv "${{ github.workspace }}/.devcontainer.bak" "${{ github.workspace }}/.devcontainer"
+        fi
+        rm -f "${{ github.workspace }}/NuGet.Config"
+        if [ -f "${{ github.workspace }}/NuGet.Config.bak" ]; then
+          mv "${{ github.workspace }}/NuGet.Config.bak" "${{ github.workspace }}/NuGet.Config"
         fi
 
     - name: Finalize test
