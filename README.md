@@ -22,9 +22,9 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: spritely/actions.publish-nuget@v0.1.1
+      - uses: spritely/actions.publish-nuget@v0.3.0
         with:
           nugetAuthToken: ${{ github.token }}
           projectFile: MyProject/MyProject.csproj
@@ -49,7 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: spritely/actions.publish-nuget@v0.1.1
+      - uses: spritely/actions.publish-nuget@v0.3.0
         with:
           nugetAuthToken: ${{ github.token }}
           projectFile: MyPackage/MyPackage.csproj
