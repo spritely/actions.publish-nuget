@@ -9,7 +9,7 @@ jobs:
     steps:
       - id: version
         name: Get semantic version
-        uses: spritely/actions.semantic-version/get@9030147256b1893f621a45535878d4050b9ad168
+        uses: spritely/actions.semantic-version/get@ca3d000233327dc116dab2b32f86f641b2b8a673
 
       - name: Create .env for build
         shell: bash
@@ -22,6 +22,6 @@ jobs:
 
       - name: Apply semantic version
         if: ${{ steps.version.outputs.branchName == github.event.repository.default_branch }}
-        uses: spritely/actions.semantic-version/apply@9030147256b1893f621a45535878d4050b9ad168
+        uses: spritely/actions.semantic-version/apply@ca3d000233327dc116dab2b32f86f641b2b8a673
         with:
           version: ${{ steps.version.outputs.version }}
