@@ -33,7 +33,7 @@ runs:
   steps:
     - name: Login to GitHub container registry
       if: inputs.registryHost != '' && inputs.registryUsername != '' && inputs.registryPassword != ''
-      uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+      uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
       with:
         registry: ${{ inputs.registryHost }}
         username: ${{ inputs.registryUsername }}
@@ -70,7 +70,7 @@ runs:
 
     - name: Publish NuGet package
       if: github.ref_type == 'branch'
-      uses: devcontainers/ci@8bf61b26e9c3a98f69cb6ce2f88d24ff59b785c6
+      uses: devcontainers/ci@8bf61b26e9c3a98f69cb6ce2f88d24ff59b785c6 # v0.3.1900000417
       with:
         runCmd: |
           source "/src/${{ steps.prepare.outputs.publishNuGetDirectory }}/publish-nuget.sh"

@@ -1,6 +1,6 @@
 {
     "name": "Test .NET 10 Container",
-    "dockerComposeFile": "docker-compose.yaml",
+    "dockerComposeFile": "compose.yaml",
     "service": "dotnet10-workflow-test-dev",
     "workspaceFolder": "/src",
     "features": {}

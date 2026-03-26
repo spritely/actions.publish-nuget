@@ -1,0 +1,24 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:best-practices"],
+  "description": "Automated dependency updates with automerge",
+  "automerge": true,
+  "platformAutomerge": false,
+  "prHourlyLimit": 0,
+  "rebaseWhen": "behind-base-branch",
+  "packageRules": [
+    {
+      "description": "dotnet/sdk Docker images: block major updates",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["mcr.microsoft.com/dotnet/sdk"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "localhost images: disable entirely (test fixture)",
+      "matchDatasources": ["docker"],
+      "matchPackagePatterns": ["^localhost"],
+      "enabled": false
+    }
+  ]
+}
