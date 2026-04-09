@@ -1,7 +1,7 @@
 services:
   actions-publish-nuget-dev:
     container_name: actions-publish-nuget-dev
-    image: docker.io/spritelydev/dotnet10-devcontainer:0.4.15@sha256:d4b6b2a3be98ad191d6dead666e2b06dff490ef9561addd722af7fcd3064d62d
+    image: docker.io/spritelydev/dotnet10-devcontainer:0.4.17@sha256:0fcb1e30f24790d988ccb2e0085d039c07c795f72e3726390fc2a4593ef5dfbe
     privileged: true
     command: /bin/sh -c "sleep infinity"
     volumes:
