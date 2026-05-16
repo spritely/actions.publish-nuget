@@ -21,6 +21,13 @@
       "matchPackageNames": [
         "/^localhost/"
       ]
+    },
+    {
+      "matchPackageNames": [
+        "spritelydev/dotnet10-devcontainer",
+        "spritely/actions.semantic-version"
+      ],
+      "groupName": "spritely infrastructure"
     }
   ]
 }
