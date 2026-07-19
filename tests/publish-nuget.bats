@@ -24,7 +24,7 @@ setup() {
         export PROJECT_FILE="$1"
         export VERSION="${2:-1.0.0}"
         export PACKAGE_REPOSITORY="file://${LOCAL_NUGET_FEED}/"
-        export NUGET_TOKEN="fake-token"
+        export GITHUB_TOKEN="fake-token"
 
         run bash "${SCRIPT_PATH}"
     }

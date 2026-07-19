@@ -26,11 +26,11 @@ jobs:
 
       - uses: spritely/actions.publish-nuget@v0.3.0
         with:
-          nugetAuthToken: ${{ github.token }}
           projectFile: MyProject/MyProject.csproj
           version: 1.0.0
-          # This is the default, but you can publish to other private registries
-          # Just make sure to provide the correct nugetAuthToken
+          # githubToken defaults to github.token, so it can be omitted here
+          # This is the default packageRepository, but you can publish to other private registries
+          # Just make sure to provide the correct githubToken
           # packageRepository: https://nuget.pkg.github.com/your-org/index.json
 ```
 
@@ -51,7 +51,6 @@ jobs:
 
       - uses: spritely/actions.publish-nuget@v0.3.0
         with:
-          nugetAuthToken: ${{ github.token }}
           projectFile: MyPackage/MyPackage.csproj
           version: 2.1.0-rc.1
           # Read devcontainers from here
@@ -64,9 +63,9 @@ jobs:
 
 | Parameter | Description | Required | Default |
 |-----------|-------------|----------|---------|
-| `nugetAuthToken` | NuGet authentication token | Yes | - |
 | `projectFile` | Path to .csproj file (relative to root) | Yes | - |
 | `version` | Full SemVer 2.0 version string | Yes | - |
+| `githubToken` | GitHub token used to authenticate when pushing the package | No | `github.token` |
 | `packageRepository` | NuGet feed URL | No | GitHub Packages URL |
 | `registryHost` | Container registry host for fetching devcontainer | No | - |
 | `registryUsername` | Container registry auth username | No | - |

@@ -1,6 +1,7 @@
+name: dotnet10-workflow-test
+
 services:
-  dotnet10-workflow-test-dev:
-    container_name: dotnet10-workflow-test-dev
+  dev:
     image: localhost:5000/dotnet10-workflow-test-devcontainer:latest
     command: /bin/sh -c "sleep infinity"
     network_mode: "host"
@@ -11,4 +12,4 @@ services:
       - .env
     # Environment variables have higher precedence than the .env file
     environment:
-      - NUGET_TOKEN=${NUGET_TOKEN}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}

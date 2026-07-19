@@ -2,9 +2,10 @@ name: Build and publish NuGet package through the repos devcontainer
 description: Builds and publishes a NuGet package to the package registry.
 
 inputs:
-  nugetAuthToken:
-    description: The NuGet authentication token to use when pushing the package.
-    required: true
+  githubToken:
+    description: The GitHub token to use when pushing the package. Defaults to github.token.
+    required: false
+    default: ${{ github.token }}
   projectFile:
     description: The project file to package such as MyProject/MyProject.csproj. Include the relative path from the root of the repository if necessary.
     required: true
@@ -79,7 +80,7 @@ runs:
           PROJECT_FILE=${{ inputs.projectFile }}
           VERSION=${{ inputs.version }}
           PACKAGE_REPOSITORY=${{ inputs.packageRepository }}
-          NUGET_TOKEN=${{ inputs.nugetAuthToken }}
+          GITHUB_TOKEN=${{ inputs.githubToken }}
 
     - name: Remove temporary files
       if: always()

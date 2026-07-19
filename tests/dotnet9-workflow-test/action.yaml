@@ -23,7 +23,7 @@ runs:
         registryPassword: testpassword
         projectFile: tests/dotnet9-workflow-test/TestDotnet9/TestDotnet9.csproj
         version: 1.0.0
-        nugetAuthToken: fake-token
+        githubToken: fake-token
         packageRepository: http://localhost:5001/v3/index.json
 
     - name: Assert custom devcontainer was used

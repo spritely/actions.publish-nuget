@@ -19,4 +19,4 @@ fi
 
 dotnet pack "${PROJECT_FILE}"
 
-dotnet nuget push "$(dirname "${PROJECT_FILE}")/bin/Release/*.nupkg" --source "${PACKAGE_REPOSITORY}" --api-key "${NUGET_TOKEN}"
+dotnet nuget push "$(dirname "${PROJECT_FILE}")/bin/Release/*.nupkg" --source "${PACKAGE_REPOSITORY}" --api-key "${GITHUB_TOKEN}"

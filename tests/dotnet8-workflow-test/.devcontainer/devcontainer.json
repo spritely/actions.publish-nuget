@@ -1,7 +1,7 @@
 {
     "name": "Test .NET 8 Container",
     "dockerComposeFile": "compose.yaml",
-    "service": "dotnet8-workflow-test-dev",
+    "service": "dev",
     "workspaceFolder": "/src",
     "features": {}
 }
