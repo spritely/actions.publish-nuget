@@ -1,14 +1,20 @@
+name: actions-publish-nuget
+
 services:
-  actions-publish-nuget-dev:
-    container_name: actions-publish-nuget-dev
-    image: docker.io/spritelydev/dotnet10-devcontainer:0.6.3@sha256:9207103e77f64532f949af2aedbab587b8e2eb6fde12e8421e82fe6203a8c50e
+  dev:
+    image: docker.io/spritelydev/dotnet10-devcontainer:0.7.0@sha256:e3767632db422cb3a7a0e011c89e7b3465f16a05cb5f94011fc3192409d35ac6
     privileged: true
     command: /bin/sh -c "sleep infinity"
     volumes:
       - ../:/src
-      - ${HOME:-$USERPROFILE}/.ssh:/root/.ssh:ro
+      # Codex doesn't have environment variables to do this without an
+      # enterprise subscription so map in common auth folder instead
+      - ${HOME:-$USERPROFILE}/.codex:/root/.codex
     env_file:
       - .env
     # Environment variables have higher precedence than the .env file
+    # Bare name variables only pass through if set on the host
     environment:
-      - NUGET_TOKEN=${NUGET_TOKEN}
+      - ANTHROPIC_API_KEY
+      - CLAUDE_CODE_OAUTH_TOKEN
+      - GITHUB_TOKEN
