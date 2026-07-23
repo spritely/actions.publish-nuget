@@ -11,12 +11,6 @@ jobs:
         name: Get semantic version
         uses: spritely/actions.semantic-version/get@558276f5781cee6abff5a24b85d73872f8dbde72 # v0.8.32
 
-      - name: Create .env for build
-        shell: bash
-        run: |
-          cat > ./.devcontainer/.env <<EOF
-          EOF
-
       - name: Run tests
         uses: ./tests
 
