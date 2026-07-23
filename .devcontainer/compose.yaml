@@ -2,7 +2,7 @@ name: actions-publish-nuget
 
 services:
   dev:
-    image: docker.io/spritelydev/dotnet10-devcontainer:0.8.0@sha256:e3767632db422cb3a7a0e011c89e7b3465f16a05cb5f94011fc3192409d35ac6
+    image: docker.io/spritelydev/dotnet10-devcontainer:0.8.0@sha256:7a0b8ffeb8d3d87be83d2c87d8c2438d5fadf2c4f5be341b2eab6e8fefd44672
     # When running Podman, in order for bind mounts to be editable both inside and outside the
     # devcontainer, it must either run as `root` or the user id must be translated into the
     # container properly. Setting userns_mode to "keep-id" tells podman to not shift user ids and
