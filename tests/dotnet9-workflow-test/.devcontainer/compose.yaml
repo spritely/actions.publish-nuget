@@ -9,7 +9,8 @@ services:
       - ../:/src
       - ../tests/dotnet9-workflow-test/logs:/logs
     env_file:
-      - .env
+      - path: .env
+        required: false
     # Environment variables have higher precedence than the .env file
     environment:
       - GITHUB_TOKEN=${GITHUB_TOKEN}

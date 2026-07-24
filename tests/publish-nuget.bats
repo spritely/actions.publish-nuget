@@ -4,19 +4,19 @@ setup() {
     # Create a temporary directory for each test
     export TEMP_DIR="$(mktemp -d)"
     export SCRIPT_PATH="${BATS_TEST_DIRNAME}/../publish-nuget.sh"
-    
+
     # Setup local NuGet feed
     export LOCAL_NUGET_FEED="${TEMP_DIR}/nuget-feed"
     mkdir -p "${LOCAL_NUGET_FEED}"
-    
+
     create_project() {
         local project_name="${1:-TestProject}"
         local root_path="${2:-${TEMP_DIR}}"
-        
+
         mkdir -p "${root_path}"
         cd "${root_path}"
         dotnet new classlib -n "${project_name}" --force > /dev/null
-        
+
         echo "${root_path}/${project_name}/${project_name}.csproj"
     }
 
@@ -35,13 +35,13 @@ setup() {
         local project_dir="$(dirname "${project_file}")"
         local project_name="$(basename "${project_file}" .csproj)"
         local package_name="${3:-${project_name}.${version}.nupkg}"
-        
+
         # Verify version in csproj
         grep -q "<Version>${version}</Version>" "${project_file}"
-        
+
         # Verify package created
         [ -f "${project_dir}/bin/Release/${package_name}" ]
-        
+
         # Verify package pushed to feed
         [ -f "${LOCAL_NUGET_FEED}/${package_name}" ]
     }
@@ -52,20 +52,20 @@ teardown() {
 }
 
 teardown_file() {
-    # The .NET SDK keeps a background build server (VBCSCompiler) running to speed up subsequent builds.
-    # This process isn't automatically terminated after the script runs.
-    # When you source the script in Bats, any child processes become subprocesses of the Bats test runner.
-    # Bats waits for all subprocesses to exit before completing and thus the last test hangs and never exits.
-    # "dotnet build-server shutdown" gracefully terminates the Razor build server, the VB/C# compiler server,
-    # and the MSBuild server.
-    dotnet build-server shutdown
+    # The .NET SDK leaves a persistent Roslyn compiler server (VBCSCompiler) running to speed up
+    # later builds. It inherits Bats' file descriptors, so if it outlives the suite Bats waits on it
+    # and the final test hangs forever. "dotnet build-server shutdown" is the graceful way to stop it,
+    # but in this non-root devcontainer that client hangs trying to reach the server (and PID 1 is
+    # `sleep infinity`, which never reaps the resulting zombie). Force-kill the server so cleanup is
+    # immediate and can never hang.
+    pkill -f 'Roslyn/bincore/VBCSCompiler' 2>/dev/null || true
 }
 
 @test "publish-nuget fails when project file doesn't exist" {
     # Act
     cd "${TEMP_DIR}"
     run_script "NonExistentProject.csproj" "1.0.0"
-    
+
     # Assert script fails
     [ "$status" -ne 0 ]
     [[ "$output" == *"not found"* ]]
@@ -78,7 +78,7 @@ teardown_file() {
 
     # Act
     run_script "$project_file" "$version"
-    
+
     # Assert
     assert_package_created "$project_file" "$version"
 }
@@ -90,10 +90,10 @@ teardown_file() {
 
     # Insert initial version number in file
     sed -i 's#<PropertyGroup>#<PropertyGroup>\n    <Version>1.0.0-local</Version>#' "$project_file"
-    
+
     # Act
     run_script "$project_file" "$version"
-    
+
     # Assert
     assert_package_created "$project_file" "$version"
 }
@@ -105,7 +105,7 @@ teardown_file() {
 
     # Act
     run_script "$project_file" "$version"
-    
+
     # Assert
     # NuGet converts '+' in SemVer to '.' in filenames for filesystem compatibility and could vary between environments
     # We have a well-known C# version from the devcontainer so we don't need to check for all the possible cases
@@ -121,7 +121,7 @@ teardown_file() {
     # Create nested project
     local project_file=$(create_project "SubdirLib" "${TEMP_DIR}/nested")
     local version="1.5.0"
-    
+
     # Act
     run_script "$project_file" "$version"
 
