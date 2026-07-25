@@ -1,3 +1,3 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0.101-noble-amd64@sha256:ab41a603bcdce28563e4cca6b9f010c3a8663eea9a0020d7591a180c8f6a81ca
+FROM mcr.microsoft.com/dotnet/sdk:10.0.302-noble-amd64@sha256:3dae2f7699441af56216ff64d5c9b6dfce7cd7dc7f4f71d353d29662b10a384f
 
 ENTRYPOINT ["/bin/bash", "-c", "mkdir -p /logs && echo \"CUSTOM_DEVCONTAINER: dotnet10-workflow-test-container\" > /logs/devcontainer.log && exec \"$@\"", "--"]
